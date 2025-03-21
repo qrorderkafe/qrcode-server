@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id         String     @id @default(uuid())
+  username   String     @unique
+  password   String
+  menus      Menu[]     @relation("AdminToMenu")
+  categories Category[] @relation("AdminToCategory")
+  tables     Table[]    @relation("AdminToTable")
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+}
+
+model Category {
+  id         String   @id @default(uuid())
+  name       String
+  image      String?  @db.Text
+  admin      Admin    @relation("AdminToCategory", fields: [admin_id], references: [id], onDelete: Cascade)
+  admin_id   String
+  menus      Menu[]   @relation("CategoryToMenu")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Menu {
+  id          String   @id @default(uuid())
+  name        String
+  image       String?  @db.Text
+  price       Float
+  status      Boolean  @default(true)
+  admin       Admin    @relation("AdminToMenu", fields: [admin_id], references: [id], onDelete: Cascade)
+  admin_id    String
+  category    Category @relation("CategoryToMenu", fields: [category_id], references: [id], onDelete: Cascade)
+  category_id String
+  orders      Order[]  @relation("MenuToOrder")
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model Table {
+  id         String   @id @default(uuid())
+  number     String
+  qr_code    String   @unique
+  admin      Admin    @relation("AdminToTable", fields: [admin_id], references: [id], onDelete: Cascade)
+  admin_id   String
+  orders     Order[]  @relation("TableToOrder")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id             String      @id @default(uuid())
+  customer_name  String?
+  quantity       Int
+  total_price    Float
+  payment_status Boolean     @default(false)
+  note           String?     @db.Text
+  status         OrderStatus @default(PENDING)
+  menu           Menu        @relation("MenuToOrder", fields: [menu_id], references: [id], onDelete: Cascade)
+  menu_id        String
+  table          Table       @relation("TableToOrder", fields: [table_id], references: [id], onDelete: Cascade)
+  table_id       String
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+}
