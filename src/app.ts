@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { createServer } from "http";
 import { ApiError, errorHandler } from "./lib/utils";
 import { Server } from "socket.io";
+import { adminrouter } from "./routes/admin";
 
 dotenv.config();
 const apiVersion = "/api/v1";
@@ -38,7 +39,8 @@ app.enable("trust proxy");
 app.get("/", (req, res) => {
   res.send({ status: "Success", message: "Server is running" });
 });
-// router heres
+
+app.use(`${apiVersion}/admin`, adminrouter);
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);

@@ -32,8 +32,32 @@ async function createAdmin() {
   }
 }
 
+async function createCategories() {
+  console.log("Seeding categories...");
+
+  const categories = ["minuman", "makanan"];
+
+  const admin = await prisma.admin.findFirst();
+
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
+
+  for (const category of categories) {
+    await prisma.category.create({
+      data: {
+        name: category,
+        admin_id: admin.id,
+      },
+    });
+  }
+
+  console.log("Categories seeded successfully!");
+}
+
 async function main() {
-  await createAdmin();
+  // await createAdmin();
+  await createCategories();
 }
 
 main()
