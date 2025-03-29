@@ -11,3 +11,19 @@ interface AuthenticationPayload {
   iat: number;
   exp: number;
 }
+
+type MenuWhereInput = {
+  OR?: Array<{
+    name?: {
+      contains: string;
+      mode: "insensitive";
+    };
+    category_id?: {
+      equals: string;
+    };
+  }>;
+  price?: {
+    gte?: number;
+    lte?: number;
+  };
+};

@@ -1,14 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../lib/utils";
-import * as service from "../repository/admin";
+import * as repository from "../repository/admin";
 
 export const login = async (username: string, password: string) => {
   if (!username || !password) {
     throw new ApiError("Username dan password harus diisi", 400);
   }
 
-  const admin = await service.findOneAdmin(username);
+  const admin = await repository.findOneAdmin(username);
   if (!admin) {
     throw new ApiError("Admin tidak ditemukan", 404);
   }

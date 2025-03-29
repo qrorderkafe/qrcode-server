@@ -55,18 +55,3 @@ export const logout = async (
     }
   }
 };
-
-export const addMenu = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-  } catch (error) {
-    if (error instanceof ApiError) {
-      next(new ApiError(error.message, error.statusCode));
-    } else {
-      next(new ApiError("Internal server error", 500));
-    }
-  }
-};
