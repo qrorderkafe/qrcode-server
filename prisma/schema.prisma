@@ -46,7 +46,7 @@ model Menu {
 
 model Table {
   id         String   @id @default(uuid())
-  number     String
+  number     Int
   qr_code    String   @unique
   admin      Admin    @relation("AdminToTable", fields: [admin_id], references: [id], onDelete: Cascade)
   admin_id   String
