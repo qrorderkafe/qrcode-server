@@ -1,5 +1,5 @@
 import type { Response, NextFunction, Request } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 import type { AdminRequest, AuthenticationPayload } from "../../types";
 import { ApiError } from "../lib/utils";
 import { findOneAdmin } from "../repository/admin";
@@ -35,6 +35,9 @@ export const authentication = async (
   } catch (error) {
     if (error instanceof ApiError) {
       next(new ApiError(error.message, error.statusCode));
+    }
+    if (error instanceof TokenExpiredError) {
+      next(new ApiError("Token expired", 401));
     } else {
       next(new ApiError("Internal server error", 500));
     }

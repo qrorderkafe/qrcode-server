@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import { adminrouter } from "./routes/admin";
 import { menuRouter } from "./routes/menu";
 import { tableRouter } from "./routes/table";
+import { orderRouter } from "./routes/order";
 
 dotenv.config();
 const apiVersion = "/api/v1";
@@ -45,6 +46,7 @@ app.get("/", (req, res) => {
 app.use(`${apiVersion}/admin`, adminrouter);
 app.use(`${apiVersion}/menus`, menuRouter);
 app.use(`${apiVersion}/tables`, tableRouter);
+app.use(`${apiVersion}/orders`, orderRouter);
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);

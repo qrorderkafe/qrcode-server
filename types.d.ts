@@ -1,4 +1,4 @@
-import type { Admin } from "@prisma/client";
+import type { Admin, OrderStatus } from "@prisma/client";
 import { Request } from "express";
 
 interface AdminRequest extends Request {
@@ -25,5 +25,28 @@ type MenuWhereInput = {
   price?: {
     gte?: number;
     lte?: number;
+  };
+};
+
+interface OrderItem {
+  menuId: string;
+  quantity: number;
+  note?: string;
+}
+
+interface CreateOrderDTO {
+  customerName?: string;
+  note?: string;
+  tableId: string;
+  items: OrderItem[];
+}
+
+type OrderWhereInput = {
+  table_id?: string;
+  status?: OrderStatus;
+  payment_status?: boolean;
+  created_at?: {
+    gte?: Date;
+    lte?: Date;
   };
 };

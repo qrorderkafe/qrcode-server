@@ -30,18 +30,18 @@ model Category {
 }
 
 model Menu {
-  id          String   @id @default(uuid())
+  id          String      @id @default(uuid())
   name        String
-  image       String?  @db.Text
+  image       String?     @db.Text
   price       Float
-  status      Boolean  @default(true)
-  admin       Admin    @relation("AdminToMenu", fields: [admin_id], references: [id], onDelete: Cascade)
+  status      Boolean     @default(true)
+  admin       Admin       @relation("AdminToMenu", fields: [admin_id], references: [id], onDelete: Cascade)
   admin_id    String
-  category    Category @relation("CategoryToMenu", fields: [category_id], references: [id], onDelete: Cascade)
+  category    Category    @relation("CategoryToMenu", fields: [category_id], references: [id], onDelete: Cascade)
   category_id String
-  orders      Order[]  @relation("MenuToOrder")
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  orderItems  OrderItem[] @relation("MenuToOrderItem")
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
 }
 
 model Table {
@@ -65,15 +65,26 @@ enum OrderStatus {
 model Order {
   id             String      @id @default(uuid())
   customer_name  String?
-  quantity       Int
   total_price    Float
   payment_status Boolean     @default(false)
   note           String?     @db.Text
   status         OrderStatus @default(PENDING)
-  menu           Menu        @relation("MenuToOrder", fields: [menu_id], references: [id], onDelete: Cascade)
-  menu_id        String
   table          Table       @relation("TableToOrder", fields: [table_id], references: [id], onDelete: Cascade)
   table_id       String
+  orderItems     OrderItem[] @relation("OrderToOrderItem")
   created_at     DateTime    @default(now())
   updated_at     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  quantity   Int
+  price      Float
+  note       String?  @db.Text
+  order      Order    @relation("OrderToOrderItem", fields: [order_id], references: [id], onDelete: Cascade)
+  order_id   String
+  menu       Menu     @relation("MenuToOrderItem", fields: [menu_id], references: [id], onDelete: Cascade)
+  menu_id    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
