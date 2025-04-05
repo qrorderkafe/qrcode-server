@@ -4,6 +4,7 @@ export const createMenu = async (
   name: string,
   price: number,
   categoryId: string,
+  status: boolean,
   adminId: string,
   imageUrl: string
 ) => {
@@ -11,6 +12,7 @@ export const createMenu = async (
     data: {
       name,
       price,
+      status,
       admin_id: adminId,
       image: imageUrl,
       category_id: categoryId,
@@ -27,6 +29,9 @@ export const findAllMenu = async (
     where: whereCondition,
     take,
     skip,
+    include: {
+      category: true,
+    },
     orderBy: {
       created_at: "desc",
     },
@@ -52,6 +57,7 @@ export const updateMenu = async (
   name: string,
   price: number,
   categoryId: string,
+  status: boolean,
   adminId: string,
   imageUrl: string
 ) => {
@@ -62,20 +68,10 @@ export const updateMenu = async (
     data: {
       name,
       price,
+      status,
       admin_id: adminId,
       category_id: categoryId,
       image: imageUrl,
-    },
-  });
-};
-
-export const updateMenuStatus = async (menuId: string, status: boolean) => {
-  await prisma.menu.update({
-    where: {
-      id: menuId,
-    },
-    data: {
-      status,
     },
   });
 };
@@ -86,4 +82,8 @@ export const deleteMenu = async (menuId: string) => {
       id: menuId,
     },
   });
+};
+
+export const findAllCategories = async () => {
+  return await prisma.category.findMany();
 };

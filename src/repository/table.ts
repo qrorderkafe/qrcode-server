@@ -17,14 +17,23 @@ export const tableCount = async (tableNumber?: number, qrCodeUrl?: string) => {
 
 export const createTable = async (
   tableNumber: number,
-  qrCodeUrl: string,
-  adminId: string
+  adminId: string,
+  clientUrl: string
 ) => {
-  await prisma.table.create({
+  const table = await prisma.table.create({
     data: {
       number: tableNumber,
-      qr_code: qrCodeUrl,
+      qr_code: "",
       admin_id: adminId,
+    },
+  });
+
+  await prisma.table.update({
+    where: {
+      id: table.id,
+    },
+    data: {
+      qr_code: `${clientUrl}${table.id}`,
     },
   });
 };
@@ -49,17 +58,12 @@ export const deleteTable = async (id: string) => {
   });
 };
 
-export const updateTable = async (
-  id: string,
-  qrCodeUrl: string,
-  number: number
-) => {
+export const updateTable = async (id: string, number: number) => {
   await prisma.table.update({
     where: {
       id,
     },
     data: {
-      qr_code: qrCodeUrl,
       number,
     },
   });

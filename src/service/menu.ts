@@ -6,6 +6,7 @@ export const addMenu = async (
   name: string,
   price: number,
   categoryId: string,
+  status: number,
   adminId: string,
   imageFile?: Express.Multer.File
 ) => {
@@ -23,6 +24,7 @@ export const addMenu = async (
     name,
     parseInt(price.toString()),
     categoryId,
+    status === 0 ? false : true,
     adminId,
     uploadFile.url
   );
@@ -98,6 +100,7 @@ export const updateMenu = async (
   name: string,
   price: number,
   categoryId: string,
+  status: number,
   adminId: string,
   imageFile?: Express.Multer.File
 ) => {
@@ -122,6 +125,7 @@ export const updateMenu = async (
       name,
       parseInt(price.toString()),
       categoryId,
+      status === 0 ? false : true,
       adminId,
       uploadFile.url
     );
@@ -131,24 +135,11 @@ export const updateMenu = async (
       name,
       parseInt(price.toString()),
       categoryId,
+      status === 0 ? false : true,
       adminId,
       menu.image!
     );
   }
-};
-
-export const updateMenuStatus = async (menudId: string) => {
-  const menu = await repository.findOneMenu(menudId);
-  if (!menu) {
-    throw new ApiError("Menu tidak ditemukan", 404);
-  }
-  let status: boolean;
-  if (menu.status) {
-    status = false;
-  } else {
-    status = true;
-  }
-  await repository.updateMenuStatus(menudId, status);
 };
 
 export const deleteMenu = async (menuId: string) => {
@@ -157,4 +148,8 @@ export const deleteMenu = async (menuId: string) => {
     throw new ApiError("Menu tidak ditemukan", 404);
   }
   await repository.deleteMenu(menuId);
+};
+
+export const getAllCategories = async () => {
+  return await repository.findAllCategories();
 };

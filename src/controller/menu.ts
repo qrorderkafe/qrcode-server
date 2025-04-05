@@ -8,10 +8,17 @@ export const addMenu = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, price, categoryId } = req.body;
+  const { name, price, categoryId, status } = req.body;
   const imageFile = req.file;
   try {
-    await service.addMenu(name, price, categoryId, req.admin?.id!, imageFile);
+    await service.addMenu(
+      name,
+      price,
+      categoryId,
+      Number(status),
+      req.admin?.id!,
+      imageFile
+    );
 
     res.status(201).json({
       status: "Success",
@@ -108,7 +115,7 @@ export const updateMenu = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, price, categoryId } = req.body;
+  const { name, price, categoryId, status } = req.body;
   const imageFile = req.file;
   const id = req.params.id;
   try {
@@ -117,6 +124,7 @@ export const updateMenu = async (
       name,
       price,
       categoryId,
+      Number(status),
       req.admin?.id!,
       imageFile
     );
@@ -124,28 +132,6 @@ export const updateMenu = async (
     res.status(200).json({
       status: "Success",
       message: "Menu berhasil diupdate",
-    });
-  } catch (error) {
-    if (error instanceof ApiError) {
-      next(new ApiError(error.message, error.statusCode));
-    } else {
-      next(new ApiError("Internal server error", 500));
-    }
-  }
-};
-
-export const updateMenuStatus = async (
-  req: AdminRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const id = req.params.id;
-  try {
-    await service.updateMenuStatus(id);
-
-    res.status(200).json({
-      status: "Success",
-      message: "Status menu berhasil diupdate",
     });
   } catch (error) {
     if (error instanceof ApiError) {
@@ -168,6 +154,28 @@ export const deleteMenu = async (
     res.status(200).json({
       status: "Success",
       message: "Menu berhasil dihapus",
+    });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      next(new ApiError(error.message, error.statusCode));
+    } else {
+      next(new ApiError("Internal server error", 500));
+    }
+  }
+};
+
+export const getAllCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const categories = await service.getAllCategories();
+
+    res.status(200).json({
+      status: "Success",
+      message: "Berhasil mendapatkan semua kategori",
+      data: categories,
     });
   } catch (error) {
     if (error instanceof ApiError) {

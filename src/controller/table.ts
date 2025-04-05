@@ -8,9 +8,9 @@ export const createTable = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { qrCodeUrl, tableNumber } = req.body;
+  const { tableNumber } = req.body;
   try {
-    await service.createTable(qrCodeUrl, parseInt(tableNumber), req.admin?.id!);
+    await service.createTable(parseInt(tableNumber), req.admin?.id!);
     res.status(201).json({ message: "Meja berhasil dibuat" });
   } catch (error) {
     if (error instanceof ApiError) {
@@ -88,10 +88,10 @@ export const updateTable = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { qrCodeUrl, tableNumber } = req.body;
+  const { tableNumber } = req.body;
   const id = req.params.id;
   try {
-    await service.updateTable(id, qrCodeUrl, parseInt(tableNumber));
+    await service.updateTable(id, parseInt(tableNumber));
     res.status(200).json({
       status: "Success",
       message: "Meja berhasil diupdate",

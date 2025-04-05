@@ -1,16 +1,19 @@
 import { ApiError } from "../lib/utils";
 import * as repository from "../repository/table";
 
-export const createTable = async (
-  qrCodeUrl: string,
-  tableNumber: number,
-  adminId: string
-) => {
+export const createTable = async (tableNumber: number, adminId: string) => {
+  if (!tableNumber) {
+    throw new ApiError("Nomor meja tidak boleh kosong", 400);
+  }
   const tableCount = await repository.tableCount(tableNumber);
   if (tableCount > 0) {
     throw new ApiError("Meja sudah ada", 400);
   }
-  await repository.createTable(tableNumber, qrCodeUrl, adminId);
+
+  const clientDomain = `${
+    process.env.NODE_ENV === "development" ? "http" : "https"
+  }://${process.env.CLIENT_DOMAIN}/order?table=`;
+  await repository.createTable(tableNumber, adminId, clientDomain);
 };
 
 export const getAllTable = async () => {
@@ -33,11 +36,7 @@ export const deleteTable = async (id: string) => {
   await repository.deleteTable(id);
 };
 
-export const updateTable = async (
-  id: string,
-  qrCodeUrl: string,
-  tableNumber: number
-) => {
+export const updateTable = async (id: string, tableNumber: number) => {
   const table = await repository.findTableById(id);
   if (!table) {
     throw new ApiError("Meja tidak ditemukan", 404);
@@ -50,20 +49,9 @@ export const updateTable = async (
     }
   }
 
-  if (qrCodeUrl && qrCodeUrl !== table.qr_code) {
-    const tableCount = await repository.tableCount(undefined, qrCodeUrl);
-    if (tableCount > 0) {
-      throw new ApiError("QR Code sudah ada", 400);
-    }
-  }
-
-  if (qrCodeUrl) {
-    table.qr_code = qrCodeUrl;
-  }
-
   if (tableNumber) {
     table.number = tableNumber;
   }
 
-  await repository.updateTable(id, table.qr_code, table.number);
+  await repository.updateTable(id, table.number);
 };
