@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Admin {
-  id         String     @id @default(uuid())
-  username   String     @unique
-  password   String
-  menus      Menu[]     @relation("AdminToMenu")
-  categories Category[] @relation("AdminToCategory")
-  tables     Table[]    @relation("AdminToTable")
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
+  id            String         @id @default(uuid())
+  username      String         @unique
+  password      String
+  menus         Menu[]         @relation("AdminToMenu")
+  categories    Category[]     @relation("AdminToCategory")
+  tables        Table[]        @relation("AdminToTable")
+  notifications Notification[] @relation()
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
 }
 
 model Category {
@@ -63,17 +64,18 @@ enum OrderStatus {
 }
 
 model Order {
-  id             String      @id @default(uuid())
+  id             String         @id @default(uuid())
   customer_name  String?
   total_price    Float
-  payment_status Boolean     @default(false)
-  note           String?     @db.Text
-  status         OrderStatus @default(PENDING)
-  table          Table       @relation("TableToOrder", fields: [table_id], references: [id], onDelete: Cascade)
+  payment_status Boolean        @default(false)
+  note           String?        @db.Text
+  status         OrderStatus    @default(PENDING)
+  table          Table          @relation("TableToOrder", fields: [table_id], references: [id], onDelete: Cascade)
   table_id       String
-  orderItems     OrderItem[] @relation("OrderToOrderItem")
-  created_at     DateTime    @default(now())
-  updated_at     DateTime    @updatedAt
+  orderItems     OrderItem[]    @relation("OrderToOrderItem")
+  notifications  Notification[] @relation()
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
 }
 
 model OrderItem {
@@ -87,4 +89,23 @@ model OrderItem {
   menu_id    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+model Notification {
+  id         String           @id @default(uuid())
+  message    String
+  read       Boolean          @default(false)
+  admin_id   String
+  admin      Admin            @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+  order_id   String?
+  order      Order?           @relation(fields: [order_id], references: [id], onDelete: SetNull)
+  type       NotificationType
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+}
+
+enum NotificationType {
+  NEW_ORDER
+  ORDER_STATUS_CHANGE
+  PAYMENT_RECEIVED
 }

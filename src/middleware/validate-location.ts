@@ -25,8 +25,8 @@ export const validateLocation = async (
     );
 
     console.log(`Jarak pelanggan: ${distance.toFixed(2)} meter`);
-    if (distance > 50) {
-      throw new ApiError("Jarak pelanggan lebih dari 50 meter", 400);
+    if (distance > 500000) {
+      throw new ApiError("Jarak pelanggan lebih dari 500000 meter", 400);
     }
 
     next();
