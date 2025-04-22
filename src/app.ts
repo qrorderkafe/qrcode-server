@@ -10,6 +10,7 @@ import { adminrouter } from "./routes/admin";
 import { menuRouter } from "./routes/menu";
 import { tableRouter } from "./routes/table";
 import { orderRouter } from "./routes/order";
+import { initSocketIO } from "./lib/socket-handler";
 
 dotenv.config();
 const apiVersion = "/api/v1";
@@ -25,6 +26,8 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
+initSocketIO(io);
 
 app.use(express.json());
 app.use(morgan("dev"));
@@ -50,6 +53,16 @@ app.use(`${apiVersion}/orders`, orderRouter);
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);
+
+  socket.on("join-admin-room", (adminId) => {
+    socket.join(`admin-${adminId}`);
+    console.log(`Admin ${adminId} joined notification room`);
+  });
+
+  socket.on("leave-admin-room", (adminId) => {
+    socket.leave(`admin-${adminId}`);
+    console.log(`Admin ${adminId} left notification room`);
+  });
 
   socket.on("disconnect", () => {
     console.log(`Socket disconnected: ${socket.id}`);
