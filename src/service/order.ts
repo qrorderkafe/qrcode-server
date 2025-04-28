@@ -3,7 +3,9 @@ import { ApiError } from "../lib/utils";
 import { findAllMenu } from "../repository/menu";
 import { findTableById } from "../repository/table";
 import * as repository from "../repository/order";
+import * as notificationRepository from "../repository/notification";
 import type { OrderStatus } from "@prisma/client";
+import { emitNewOrder } from "../lib/socket-handler";
 
 export const createOrder = async (data: CreateOrderDTO) => {
   const { items, tableId, customerName, note } = data;
@@ -61,6 +63,15 @@ export const createOrder = async (data: CreateOrderDTO) => {
     note,
     customerName
   );
+
+  const newNotificaton = await notificationRepository.createNotification(
+    table.admin_id,
+    `Pesanan baru dari meja ${table.number}`,
+    "NEW_ORDER",
+    order.id
+  );
+
+  emitNewOrder(newNotificaton);
 
   return order;
 };
@@ -123,6 +134,13 @@ export const updateOrderStatus = async (id: string, status: OrderStatus) => {
   if (!validateStatus.includes(status)) {
     throw new ApiError("Status tidak valid", 400);
   }
+
+  await notificationRepository.createNotification(
+    order.table.admin_id,
+    `Status pesanan dari meja ${order.table.number} berubah menjadi ${status}`,
+    "ORDER_STATUS_CHANGE",
+    order.id
+  );
 
   await repository.updateOrderStatus(id, status);
 };

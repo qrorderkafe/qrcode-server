@@ -11,6 +11,7 @@ import { menuRouter } from "./routes/menu";
 import { tableRouter } from "./routes/table";
 import { orderRouter } from "./routes/order";
 import { initSocketIO } from "./lib/socket-handler";
+import { notificationRouter } from "./routes/notification";
 
 dotenv.config();
 const apiVersion = "/api/v1";
@@ -20,11 +21,14 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-      process.env.CLIENT_DOMAIN
-    }`,
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : `https://${process.env.CLIENT_DOMAIN}`,
     credentials: true,
+    methods: ["GET", "POST"],
   },
+  transports: ["websocket", "polling"],
 });
 
 initSocketIO(io);
@@ -34,10 +38,12 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: `${process.env.NODE_ENV === "development" ? "http" : "https"}://${
-      process.env.CLIENT_DOMAIN
-    }`,
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : `https://${process.env.CLIENT_DOMAIN}`,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   })
 );
 
@@ -50,23 +56,32 @@ app.use(`${apiVersion}/admin`, adminrouter);
 app.use(`${apiVersion}/menus`, menuRouter);
 app.use(`${apiVersion}/tables`, tableRouter);
 app.use(`${apiVersion}/orders`, orderRouter);
+app.use(`${apiVersion}/notifications`, notificationRouter);
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);
 
-  socket.on("join-admin-room", (adminId) => {
-    socket.join(`admin-${adminId}`);
-    console.log(`Admin ${adminId} joined notification room`);
+  socket.on("join-admin-room", () => {
+    socket.join("all-admins");
+    console.log(`Admin joined notification room: ${socket.id}`);
   });
 
-  socket.on("leave-admin-room", (adminId) => {
-    socket.leave(`admin-${adminId}`);
-    console.log(`Admin ${adminId} left notification room`);
+  socket.on("leave-admin-room", () => {
+    socket.leave("all-admins");
+    console.log(`Admin left notification room: ${socket.id}`);
   });
 
   socket.on("disconnect", () => {
     console.log(`Socket disconnected: ${socket.id}`);
   });
+});
+
+io.engine.on("connection_error", (err) => {
+  console.log("Socket.io connection error:");
+  console.log(err.req);
+  console.log(err.code);
+  console.log(err.message);
+  console.log(err.context);
 });
 
 app.all("*", (req, res, next) => {

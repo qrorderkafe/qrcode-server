@@ -1,5 +1,6 @@
 import type { Admin, OrderStatus } from "@prisma/client";
 import { Request } from "express";
+import { Prisma } from "@prisma/client";
 
 interface AdminRequest extends Request {
   admin?: Admin;
@@ -50,3 +51,18 @@ type OrderWhereInput = {
     lte?: Date;
   };
 };
+
+type NotificationWithOrderDetail = Prisma.NotificationGetPayload<{
+  include: {
+    order: {
+      include: {
+        table: true;
+        orderItems: {
+          include: {
+            menu: true;
+          };
+        };
+      };
+    };
+  };
+}>;
