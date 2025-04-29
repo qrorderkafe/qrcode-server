@@ -66,3 +66,24 @@ type NotificationWithOrderDetail = Prisma.NotificationGetPayload<{
     };
   };
 }>;
+
+type NotificationWithOrder = Prisma.NotificationGetPayload<{
+  include: {
+    order: {
+      include: {
+        table: true;
+      };
+    };
+  };
+}>;
+
+type OrderWithDetail = Prisma.OrderGetPayload<{
+  include: {
+    orderItems: {
+      include: {
+        menu: true;
+      };
+    };
+    table: true;
+  };
+}>;

@@ -80,5 +80,13 @@ export const updateOrderStatus = async (id: string, status: OrderStatus) => {
     data: {
       status,
     },
+    include: {
+      table: true,
+      orderItems: {
+        include: {
+          menu: true,
+        },
+      },
+    },
   });
 };

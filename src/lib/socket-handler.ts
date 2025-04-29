@@ -1,6 +1,6 @@
 import type { Notification } from "@prisma/client";
 import { Server } from "socket.io";
-import type { NotificationWithOrderDetail } from "../../types";
+import type { NotificationWithOrderDetail, OrderWithDetail } from "../../types";
 
 let io: Server;
 
@@ -28,7 +28,7 @@ export const emitNewOrder = (notification: NotificationWithOrderDetail) => {
     });
 };
 
-export const emitOrderStatusChange = (order: any) => {
+export const emitOrderStatusChange = (order: OrderWithDetail) => {
   getIO()
     .to(ADMIN_ROOM)
     .emit("order-status-change", {

@@ -5,7 +5,7 @@ import { findTableById } from "../repository/table";
 import * as repository from "../repository/order";
 import * as notificationRepository from "../repository/notification";
 import type { OrderStatus } from "@prisma/client";
-import { emitNewOrder } from "../lib/socket-handler";
+import { emitNewOrder, emitOrderStatusChange } from "../lib/socket-handler";
 
 export const createOrder = async (data: CreateOrderDTO) => {
   const { items, tableId, customerName, note } = data;
@@ -135,12 +135,6 @@ export const updateOrderStatus = async (id: string, status: OrderStatus) => {
     throw new ApiError("Status tidak valid", 400);
   }
 
-  await notificationRepository.createNotification(
-    order.table.admin_id,
-    `Status pesanan dari meja ${order.table.number} berubah menjadi ${status}`,
-    "ORDER_STATUS_CHANGE",
-    order.id
-  );
-
-  await repository.updateOrderStatus(id, status);
+  const updatedOrder = await repository.updateOrderStatus(id, status);
+  emitOrderStatusChange(updatedOrder);
 };
