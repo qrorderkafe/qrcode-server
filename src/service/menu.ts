@@ -40,30 +40,23 @@ export const getAllMenu = async (
 ) => {
   const skip = (page - 1) * limit;
   let whereCondition: MenuWhereInput = {};
+  whereCondition.AND = [];
 
   if (search) {
-    whereCondition = {
-      OR: [
-        {
-          name: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-      ],
-    };
+    whereCondition.AND.push({
+      name: {
+        contains: search,
+        mode: "insensitive",
+      },
+    });
   }
 
   if (category) {
-    whereCondition = {
-      OR: [
-        {
-          category_id: {
-            equals: category,
-          },
-        },
-      ],
-    };
+    whereCondition.AND.push({
+      category_id: {
+        equals: category,
+      },
+    });
   }
 
   if (minPrice !== undefined || maxPrice !== undefined) {

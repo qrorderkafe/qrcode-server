@@ -14,7 +14,7 @@ interface AuthenticationPayload {
 }
 
 type MenuWhereInput = {
-  OR?: Array<{
+  AND?: Array<{
     name?: {
       contains: string;
       mode: "insensitive";
