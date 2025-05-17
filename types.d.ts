@@ -87,3 +87,12 @@ type OrderWithDetail = Prisma.OrderGetPayload<{
     table: true;
   };
 }>;
+
+type ReportWhereInput = {
+  AND?: Array<{
+    created_at?: {
+      gte?: Date;
+      lte?: Date;
+    };
+  }>;
+};

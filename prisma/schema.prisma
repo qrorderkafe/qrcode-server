@@ -15,6 +15,7 @@ model Admin {
   categories    Category[]     @relation("AdminToCategory")
   tables        Table[]        @relation("AdminToTable")
   notifications Notification[] @relation()
+  salesReports  SalesReport[]  @relation()
   created_at    DateTime       @default(now())
   updated_at    DateTime       @updatedAt
 }
@@ -74,6 +75,8 @@ model Order {
   table_id       String
   orderItems     OrderItem[]    @relation("OrderToOrderItem")
   notifications  Notification[] @relation()
+  salesReport_id String?
+  salesReport    SalesReport?   @relation("ReportToOrder", fields: [salesReport_id], references: [id], onDelete: SetNull)
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
 }
@@ -108,4 +111,16 @@ enum NotificationType {
   NEW_ORDER
   ORDER_STATUS_CHANGE
   PAYMENT_RECEIVED
+}
+
+model SalesReport {
+  id               String   @id @default(uuid())
+  date             DateTime
+  total_items_sold Int
+  income           Float
+  admin_id         String
+  admin            Admin    @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+  orders           Order[]  @relation("ReportToOrder")
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
 }

@@ -37,6 +37,7 @@ export const getAllTable = async (
     if (error instanceof ApiError) {
       next(new ApiError(error.message, error.statusCode));
     } else {
+      next(new ApiError("Internal server error", 500));
     }
   }
 };

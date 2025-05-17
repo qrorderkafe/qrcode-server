@@ -12,6 +12,8 @@ import { tableRouter } from "./routes/table";
 import { orderRouter } from "./routes/order";
 import { initSocketIO } from "./lib/socket-handler";
 import { notificationRouter } from "./routes/notification";
+import { reportRouter } from "./routes/report";
+import { statsRouter } from "./routes/stats";
 
 dotenv.config();
 const apiVersion = "/api/v1";
@@ -57,6 +59,8 @@ app.use(`${apiVersion}/menus`, menuRouter);
 app.use(`${apiVersion}/tables`, tableRouter);
 app.use(`${apiVersion}/orders`, orderRouter);
 app.use(`${apiVersion}/notifications`, notificationRouter);
+app.use(`${apiVersion}/reports`, reportRouter);
+app.use(`${apiVersion}/stats`, statsRouter);
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);

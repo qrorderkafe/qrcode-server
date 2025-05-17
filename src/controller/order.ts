@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { ApiError } from "../lib/utils";
-import type { CreateOrderDTO } from "../../types";
+import type { AdminRequest, CreateOrderDTO } from "../../types";
 import * as service from "../service/order";
 import type { OrderStatus } from "@prisma/client";
 
@@ -82,14 +82,14 @@ export const getOrderById = async (
 };
 
 export const updateOrderStatus = async (
-  req: Request,
+  req: AdminRequest,
   res: Response,
   next: NextFunction
 ) => {
   const id = req.params.id;
   const { status } = req.body;
   try {
-    const order = await service.updateOrderStatus(id, status);
+    const order = await service.updateOrderStatus(id, status, req.admin!.id);
     res.status(200).json({
       status: "Success",
       message: "Status pesanan berhasil diupdate",

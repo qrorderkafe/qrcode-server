@@ -6,6 +6,11 @@ import * as repository from "../repository/order";
 import * as notificationRepository from "../repository/notification";
 import type { OrderStatus } from "@prisma/client";
 import { emitNewOrder, emitOrderStatusChange } from "../lib/socket-handler";
+import {
+  createReport,
+  findReportByDateAndAdminId,
+  updateReport,
+} from "../repository/report";
 
 export const createOrder = async (data: CreateOrderDTO) => {
   const { items, tableId, customerName, note } = data;
@@ -115,7 +120,11 @@ export const getOrderById = async (id: string) => {
   return order;
 };
 
-export const updateOrderStatus = async (id: string, status: OrderStatus) => {
+export const updateOrderStatus = async (
+  id: string,
+  status: OrderStatus,
+  adminId: string
+) => {
   if (!id || !status) {
     throw new ApiError("ID dan status diperlukan", 400);
   }
@@ -136,5 +145,32 @@ export const updateOrderStatus = async (id: string, status: OrderStatus) => {
   }
 
   const updatedOrder = await repository.updateOrderStatus(id, status);
+  if (updatedOrder.status === "COMPLETED") {
+    const orderDate = new Date(updatedOrder.created_at);
+    orderDate.setHours(0, 0, 0, 0);
+
+    const report = await findReportByDateAndAdminId(orderDate, adminId);
+    const totalItems = updatedOrder.orderItems.reduce((acc, item) => {
+      return acc + item.quantity;
+    }, 0);
+
+    if (report) {
+      await updateReport(
+        report.id,
+        totalItems,
+        updatedOrder.total_price,
+        updatedOrder.id
+      );
+    } else {
+      await createReport(
+        orderDate,
+        adminId,
+        totalItems,
+        updatedOrder.total_price,
+        updatedOrder.id
+      );
+    }
+  }
+
   emitOrderStatusChange(updatedOrder);
 };

@@ -90,3 +90,42 @@ export const updateOrderStatus = async (id: string, status: OrderStatus) => {
     },
   });
 };
+
+export const statusOrdersCount = async (status: OrderStatus) => {
+  return await prisma.order.count({
+    where: {
+      status,
+    },
+  });
+};
+
+export const getTotalOrderCount = async () => {
+  return await prisma.order.count({
+    where: {
+      salesReport_id: { not: null },
+    },
+  });
+};
+
+export const getOrdersCountByDate = async (start: Date, end: Date) => {
+  return await prisma.order.count({
+    where: {
+      created_at: {
+        gte: start,
+        lte: end,
+      },
+    },
+  });
+};
+
+export const getCompletedOrdersCountByDate = async (start: Date, end: Date) => {
+  return await prisma.order.count({
+    where: {
+      status: "COMPLETED",
+      created_at: {
+        gte: start,
+        lte: end,
+      },
+    },
+  });
+};
