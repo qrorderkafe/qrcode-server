@@ -35,7 +35,7 @@ async function createAdmin() {
 async function createCategories() {
   console.log("Seeding categories...");
 
-  const categories = ["minuman", "makanan"];
+  const categories = ["minuman", "makanan", "seafood"];
 
   const admin = await prisma.admin.findFirst();
 
