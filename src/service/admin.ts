@@ -8,7 +8,7 @@ export const login = async (username: string, password: string) => {
     throw new ApiError("Username dan password harus diisi", 400);
   }
 
-  const admin = await repository.findOneAdmin(username);
+  const admin = await repository.findOneAdminByUsername(username);
   if (!admin) {
     throw new ApiError("Admin tidak ditemukan", 404);
   }
@@ -32,4 +32,12 @@ export const login = async (username: string, password: string) => {
     ...payload,
     token,
   };
+};
+
+export const getAdminById = async (id: string) => {
+  const admin = await repository.findOneAdminById(id);
+  if (!admin) {
+    throw new ApiError("Admin tidak ditemukan", 404);
+  }
+  return admin;
 };

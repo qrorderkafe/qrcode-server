@@ -43,13 +43,27 @@ interface CreateOrderDTO {
 }
 
 type OrderWhereInput = {
-  table_id?: string;
-  status?: OrderStatus;
-  payment_status?: boolean;
-  created_at?: {
-    gte?: Date;
-    lte?: Date;
-  };
+  AND?: Array<{
+    OR?: Array<{
+      customer_name?: {
+        contains: string;
+        mode: "insensitive";
+      };
+      table?: {
+        number: {
+          equals: number;
+        };
+      };
+    }>;
+    status?: {
+      equals?: OrderStatus;
+    };
+    tableId?: string;
+    created_at?: {
+      gte?: Date;
+      lte?: Date;
+    };
+  }>;
 };
 
 type NotificationWithOrderDetail = Prisma.NotificationGetPayload<{

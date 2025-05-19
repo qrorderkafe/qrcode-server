@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { ApiError } from "../lib/utils";
 import * as service from "../service/admin";
+import type { AdminRequest } from "../../types";
 
 export const login = async (
   req: Request,
@@ -46,6 +47,27 @@ export const logout = async (
     res.status(200).json({
       status: "Success",
       message: "Admin berhasil logout",
+    });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      next(new ApiError(error.message, error.statusCode));
+    } else {
+      next(new ApiError("Internal server error", 500));
+    }
+  }
+};
+
+export const getAdminById = async (
+  req: AdminRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const admin = await service.getAdminById(req.admin!.id);
+    res.status(200).json({
+      status: "Success",
+      message: "Berhasil mendapatkan admin",
+      data: admin,
     });
   } catch (error) {
     if (error instanceof ApiError) {

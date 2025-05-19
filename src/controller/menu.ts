@@ -48,6 +48,8 @@ export const getAllMenu = async (
   const maxPrice = req.query.maxPrice
     ? parseFloat(req.query.maxPrice as string)
     : undefined;
+  const sortBy = req.query.sortBy as string;
+  const sortMenu = req.query.sortMenu as string;
 
   try {
     const { menus, totalMenus, totalPages } = await service.getAllMenu(
@@ -56,7 +58,9 @@ export const getAllMenu = async (
       search,
       category,
       minPrice,
-      maxPrice
+      maxPrice,
+      sortBy,
+      sortMenu
     );
 
     res.status(200).json({
@@ -70,11 +74,13 @@ export const getAllMenu = async (
         itemsPerPage: limit,
         hasNextPage: page < totalPages,
         hasPrevPage: page > 1,
-        filtes: {
+        filters: {
           search: search || undefined,
           minPrice: minPrice || undefined,
           maxPrice: maxPrice || undefined,
           category: category || undefined,
+          sortBy: sortBy || undefined,
+          sortMenu: sortMenu || undefined,
         },
       },
     });

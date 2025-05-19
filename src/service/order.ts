@@ -82,34 +82,84 @@ export const createOrder = async (data: CreateOrderDTO) => {
 };
 
 export const getAllOrders = async (
+  page: number,
+  limit: number,
   tableId?: string,
   status?: OrderStatus,
-  paymentStatus?: string,
-  fromDate?: string,
-  toDate?: string
+  startDate?: string,
+  endDate?: string,
+  sortBy?: string,
+  sortOrder?: string,
+  search?: string
 ) => {
+  const skip = (page - 1) * limit;
   const whereCondition: OrderWhereInput = {};
+  whereCondition.AND = [];
+
+  if (search) {
+    if (search.includes("meja")) {
+      whereCondition.AND?.push({
+        OR: [
+          {
+            table: {
+              number: {
+                equals: parseInt(search.replace("meja", "")),
+              },
+            },
+          },
+        ],
+      });
+    } else {
+      whereCondition.AND?.push({
+        OR: [
+          {
+            customer_name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        ],
+      });
+    }
+  }
+
   if (tableId) {
-    whereCondition.table_id = tableId;
+    whereCondition.AND?.push({
+      tableId,
+    });
   }
-  if (status) {
-    whereCondition.status = status;
+  if (status && status !== undefined) {
+    whereCondition.AND?.push({
+      status: {
+        equals: status,
+      },
+    });
   }
-  if (paymentStatus !== undefined) {
-    whereCondition.payment_status = paymentStatus === "true";
+  if (startDate && endDate) {
+    whereCondition.AND?.push({
+      created_at: {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      },
+    });
   }
 
-  if (fromDate || toDate) {
-    whereCondition.created_at = {};
-    if (fromDate) {
-      whereCondition.created_at.gte = new Date(fromDate);
-    }
-    if (toDate) {
-      whereCondition.created_at.lte = new Date(toDate);
-    }
-  }
+  const totalOrders = await repository.getTotalOrder(whereCondition);
+  const totalPages = Math.ceil(totalOrders / limit);
 
-  return await repository.findAllOrder(whereCondition);
+  const orders = await repository.findAllOrder(
+    whereCondition,
+    limit,
+    skip,
+    sortBy,
+    sortOrder
+  );
+
+  return {
+    orders,
+    totalOrders,
+    totalPages,
+  };
 };
 
 export const getOrderById = async (id: string) => {

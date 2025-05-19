@@ -39,9 +39,17 @@ export const createOrder = async (
   return order;
 };
 
-export const findAllOrder = async (where: {}) => {
+export const findAllOrder = async (
+  where: {},
+  take: number,
+  skip: number,
+  sortBy?: string,
+  sortOrder?: string
+) => {
   return await prisma.order.findMany({
     where,
+    take,
+    skip,
     include: {
       table: true,
       orderItems: {
@@ -51,7 +59,7 @@ export const findAllOrder = async (where: {}) => {
       },
     },
     orderBy: {
-      created_at: "desc",
+      [sortBy || "created_at"]: sortOrder || "desc",
     },
   });
 };
@@ -128,4 +136,8 @@ export const getCompletedOrdersCountByDate = async (start: Date, end: Date) => {
       },
     },
   });
+};
+
+export const getTotalOrder = async (whereCondition = {}) => {
+  return await prisma.order.count();
 };

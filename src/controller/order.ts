@@ -36,19 +36,43 @@ export const getAllOrders = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { tableId, status, paymentStatus, fromDate, toDate } = req.query;
+  const { tableId, status, startDate, endDate, sortBy, sortOrder, search } =
+    req.query;
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
   try {
-    const orders = await service.getAllOrders(
+    const { orders, totalOrders, totalPages } = await service.getAllOrders(
+      page,
+      limit,
       tableId as string,
       status as OrderStatus,
-      paymentStatus as string,
-      fromDate as string,
-      toDate as string
+      startDate as string,
+      endDate as string,
+      sortBy as string,
+      sortOrder as string,
+      search as string
     );
     res.status(200).json({
       status: "Success",
       message: "Berhasil mendapatkan semua pesanan",
       data: orders,
+      meta: {
+        totalOrders,
+        totalPages,
+        currentPage: page,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        filters: {
+          search: search || undefined,
+          sortBy: sortBy || undefined,
+          sortOrder: sortOrder || undefined,
+          tableId: tableId || undefined,
+          status: status || undefined,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+        },
+      },
     });
   } catch (error) {
     if (error instanceof ApiError) {

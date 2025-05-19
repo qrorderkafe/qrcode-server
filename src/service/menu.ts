@@ -36,7 +36,9 @@ export const getAllMenu = async (
   search: string,
   category: string,
   minPrice?: number,
-  maxPrice?: number
+  maxPrice?: number,
+  sortBy?: string,
+  sortMenu?: string
 ) => {
   const skip = (page - 1) * limit;
   let whereCondition: MenuWhereInput = {};
@@ -71,7 +73,13 @@ export const getAllMenu = async (
 
   const totalMenus = await repository.totalMenu(whereCondition);
   const totalPages = Math.ceil(totalMenus / limit);
-  const menus = await repository.findAllMenu(whereCondition, limit, skip);
+  const menus = await repository.findAllMenu(
+    whereCondition,
+    limit,
+    skip,
+    sortBy,
+    sortMenu
+  );
 
   return {
     menus,

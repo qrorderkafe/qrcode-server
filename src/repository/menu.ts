@@ -23,7 +23,9 @@ export const createMenu = async (
 export const findAllMenu = async (
   whereCondition = {},
   take: number,
-  skip: number
+  skip: number,
+  sortBy?: string,
+  sortMenu?: string
 ) => {
   return await prisma.menu.findMany({
     where: whereCondition,
@@ -33,7 +35,7 @@ export const findAllMenu = async (
       category: true,
     },
     orderBy: {
-      created_at: "desc",
+      [sortBy || "name"]: sortMenu || "asc",
     },
   });
 };
