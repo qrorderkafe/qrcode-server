@@ -97,13 +97,16 @@ export const getAllOrders = async (
   whereCondition.AND = [];
 
   if (search) {
-    if (search.includes("meja")) {
+    const tableMatch = search.match(/^meja\s*(\d+)$/i);
+    if (tableMatch) {
+      const tableNumber = parseInt(tableMatch[1]);
+
       whereCondition.AND?.push({
         OR: [
           {
             table: {
               number: {
-                equals: parseInt(search.replace("meja", "")),
+                equals: tableNumber,
               },
             },
           },
