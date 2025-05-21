@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   cafe-resto-api:
-    build: ./cafe-resto-api
+    build: .
     container_name: cafe-resto-api
     restart: always
     ports:
