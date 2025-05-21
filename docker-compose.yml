@@ -10,11 +10,11 @@ services:
     depends_on:
       postgres_caffe_resto:
         condition: service_healthy
-    env_file: ./cafe-resto-api/.env
+    env_file: .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_caffe_resto:5432/${POSTGRES_DB}
     volumes:
-      - ./cafe-resto-api/src:/app/src
+      - ./src:/app/src
     networks:
       - shared_network
     user: "1000:1000"
