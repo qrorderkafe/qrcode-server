@@ -21,4 +21,4 @@ COPY dist/ ./dist/
 RUN useradd --create-home --shell /bin/bash appuser
 USER appuser
 
-CMD ["node", "dist/server.js"]
+CMD ["node", "dist/src/server.js"]
