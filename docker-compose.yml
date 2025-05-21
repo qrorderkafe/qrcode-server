@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  e-voting-app:
+    build: .
+    container_name: cafe-resto-api
+    restart: always
+    ports:
+      - "127.0.0.1:6000:6000"
+    depends_on:
+      postgres_caffe_resto:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - ./src:/app/src
+    networks:
+      - shared_network
+    user: "1000:1000"
+
+  postgres_caffe_resto:
+    image: postgres:latest
+    container_name: postgres-caffe-resto
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata_caffe_resto:/var/lib/postgresql/data
+    networks:
+      - shared_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      retries: 5
+
+volumes:
+  pgdata_caffe_resto:
+    driver: local
+
+networks:
+  shared_network:
+    external: true
+    name: shared_network
