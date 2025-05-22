@@ -13,7 +13,7 @@ export const createTable = async (tableNumber: number, adminId: string) => {
   const clientDomain = `${
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : `https://${process.env.CLIENT_DOMAIN}`
+      : `https://www.${process.env.CLIENT_DOMAIN}`
   }/menu?table=`;
   await repository.createTable(tableNumber, adminId, clientDomain);
 };
