@@ -55,9 +55,33 @@ async function createCategories() {
   console.log("Categories seeded successfully!");
 }
 
+async function createLocationSetting() {
+  const locationSetting = await prisma.locationSetting.findFirst();
+
+  await prisma.locationSetting.upsert({
+    where: {
+      id: locationSetting?.id || "",
+    },
+    update: {
+      latitude: 0,
+      longitude: 0,
+      radius: 0,
+      isActive: false,
+    },
+    create: {
+      latitude: 0,
+      longitude: 0,
+      radius: 0,
+      isActive: false,
+    },
+  });
+  console.log("Location setting seeded successfully!");
+}
+
 async function main() {
   // await createAdmin();
-  await createCategories();
+  // await createCategories();
+  await createLocationSetting();
 }
 
 main()

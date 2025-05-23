@@ -14,6 +14,7 @@ import { initSocketIO } from "./lib/socket-handler";
 import { notificationRouter } from "./routes/notification";
 import { reportRouter } from "./routes/report";
 import { statsRouter } from "./routes/stats";
+import { locationSettingRouter } from "./routes/location-setting";
 
 dotenv.config();
 
@@ -124,6 +125,7 @@ app.use(`${apiVersion}/orders`, orderRouter);
 app.use(`${apiVersion}/notifications`, notificationRouter);
 app.use(`${apiVersion}/reports`, reportRouter);
 app.use(`${apiVersion}/stats`, statsRouter);
+app.use(`${apiVersion}/location-settings`, locationSettingRouter);
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);

@@ -1,8 +1,8 @@
-import type { Response, NextFunction, Request } from "express";
+import type { Response, NextFunction } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import type { AdminRequest, AuthenticationPayload } from "../../types";
 import { ApiError } from "../lib/utils";
-import { findOneAdminByUsername } from "../repository/admin";
+import { findOneAdminById, findOneAdminByUsername } from "../repository/admin";
 
 export const authentication = async (
   req: AdminRequest,
@@ -25,7 +25,7 @@ export const authentication = async (
       process.env.JWT_SECRET!
     ) as AuthenticationPayload;
 
-    const admin = await findOneAdminByUsername(payload.username);
+    const admin = await findOneAdminById(payload.id);
     if (!admin) {
       throw new ApiError("Unauthorized", 401);
     }

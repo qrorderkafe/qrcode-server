@@ -19,3 +19,15 @@ export const findOneAdminById = async (id: string) => {
     },
   });
 };
+
+export const updateAdmin = async (
+  id: string,
+  data: { username?: string; password?: string }
+) => {
+  await prisma.admin.update({
+    where: {
+      id,
+    },
+    data,
+  });
+};

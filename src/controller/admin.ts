@@ -77,3 +77,26 @@ export const getAdminById = async (
     }
   }
 };
+
+export const updateAdmin = async (
+  req: AdminRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { username, password } = req.body;
+
+  try {
+    const admin = await service.updateAdmin(req.admin?.id!, username, password);
+    res.status(200).json({
+      status: "Success",
+      message: "Berhasil mengupdate admin",
+      data: admin,
+    });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      next(new ApiError(error.message, error.statusCode));
+    } else {
+      next(new ApiError("Internal server error", 500));
+    }
+  }
+};

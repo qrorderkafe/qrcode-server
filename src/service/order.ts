@@ -187,6 +187,14 @@ export const updateOrderStatus = async (
     throw new ApiError("Pesanan tidak ditemukan", 404);
   }
 
+  if (order.status === "COMPLETED") {
+    throw new ApiError("Pesanan sudah selesai", 400);
+  }
+
+  if (order.status === "CANCELLED") {
+    throw new ApiError("Pesanan sudah dibatalkan", 400);
+  }
+
   const validateStatus: OrderStatus[] = [
     "CANCELLED",
     "COMPLETED",

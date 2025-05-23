@@ -4,7 +4,7 @@ import { getAllReports } from "../controller/report";
 
 const router: Router = Router();
 
-router.get("/", getAllReports);
+router.get("/", authentication, getAllReports);
 
 const reportRouter = router;
 export { reportRouter };

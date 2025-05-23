@@ -124,3 +124,13 @@ model SalesReport {
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 }
+
+model LocationSetting {
+  id         String   @id @default(uuid())
+  latitude   Float?
+  longitude  Float?
+  isActive   Boolean  @default(true)
+  radius     Float    @default(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
