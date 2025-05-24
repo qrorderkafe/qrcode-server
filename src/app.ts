@@ -15,6 +15,7 @@ import { notificationRouter } from "./routes/notification";
 import { reportRouter } from "./routes/report";
 import { statsRouter } from "./routes/stats";
 import { locationSettingRouter } from "./routes/location-setting";
+import { rateLimiter } from "./middleware/rate-limiter";
 
 dotenv.config();
 
