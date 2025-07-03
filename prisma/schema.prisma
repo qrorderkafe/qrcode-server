@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id            String         @id @default(uuid())
+  username      String         @unique
+  password      String
+  menus         Menu[]         @relation("AdminToMenu")
+  categories    Category[]     @relation("AdminToCategory")
+  tables        Table[]        @relation("AdminToTable")
+  notifications Notification[] @relation()
+  salesReports  SalesReport[]  @relation()
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+}
+
+model Category {
+  id         String   @id @default(uuid())
+  name       String
+  image      String?  @db.Text
+  admin      Admin    @relation("AdminToCategory", fields: [admin_id], references: [id], onDelete: Cascade)
+  admin_id   String
+  menus      Menu[]   @relation("CategoryToMenu")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Menu {
+  id          String      @id @default(uuid())
+  name        String
+  image       String?     @db.Text
+  price       Float
+  status      Boolean     @default(true)
+  admin       Admin       @relation("AdminToMenu", fields: [admin_id], references: [id], onDelete: Cascade)
+  admin_id    String
+  category    Category    @relation("CategoryToMenu", fields: [category_id], references: [id], onDelete: Cascade)
+  category_id String
+  orderItems  OrderItem[] @relation("MenuToOrderItem")
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+}
+
+model Table {
+  id         String   @id @default(uuid())
+  number     Int
+  qr_code    String   @unique
+  admin      Admin    @relation("AdminToTable", fields: [admin_id], references: [id], onDelete: Cascade)
+  admin_id   String
+  orders     Order[]  @relation("TableToOrder")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id             String         @id @default(uuid())
+  customer_name  String?
+  total_price    Float
+  payment_status Boolean        @default(false)
+  note           String?        @db.Text
+  status         OrderStatus    @default(PENDING)
+  table          Table          @relation("TableToOrder", fields: [table_id], references: [id], onDelete: Cascade)
+  table_id       String
+  orderItems     OrderItem[]    @relation("OrderToOrderItem")
+  notifications  Notification[] @relation()
+  salesReport_id String?
+  salesReport    SalesReport?   @relation("ReportToOrder", fields: [salesReport_id], references: [id], onDelete: SetNull)
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  quantity   Int
+  price      Float
+  note       String?  @db.Text
+  order      Order    @relation("OrderToOrderItem", fields: [order_id], references: [id], onDelete: Cascade)
+  order_id   String
+  menu       Menu     @relation("MenuToOrderItem", fields: [menu_id], references: [id], onDelete: Cascade)
+  menu_id    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Notification {
+  id         String           @id @default(uuid())
+  message    String
+  read       Boolean          @default(false)
+  admin_id   String
+  admin      Admin            @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+  order_id   String?
+  order      Order?           @relation(fields: [order_id], references: [id], onDelete: SetNull)
+  type       NotificationType
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+}
+
+enum NotificationType {
+  NEW_ORDER
+  ORDER_STATUS_CHANGE
+  PAYMENT_RECEIVED
+  OTHER
+}
+
+model SalesReport {
+  id               String   @id @default(uuid())
+  date             DateTime
+  total_items_sold Int
+  income           Float
+  admin_id         String
+  admin            Admin    @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+  orders           Order[]  @relation("ReportToOrder")
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+}
+
+model LocationSetting {
+  id         String   @id @default(uuid())
+  latitude   Float?
+  longitude  Float?
+  isActive   Boolean  @default(true)
+  radius     Float    @default(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
