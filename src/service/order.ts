@@ -5,7 +5,11 @@ import { findTableById } from "../repository/table";
 import * as repository from "../repository/order";
 import * as notificationRepository from "../repository/notification";
 import type { OrderStatus } from "@prisma/client";
-import { emitNewOrder, emitOrderStatusChange } from "../lib/socket-handler";
+import {
+  emitChangeTableOrder,
+  emitNewOrder,
+  emitOrderStatusChange,
+} from "../lib/socket-handler";
 import {
   createReport,
   findReportByDateAndAdminId,
@@ -234,4 +238,36 @@ export const updateOrderStatus = async (
   }
 
   emitOrderStatusChange(updatedOrder);
+};
+
+export const changeTableOrder = async (
+  id: string,
+  tableId: string,
+  oldTable: string
+) => {
+  const order = await repository.findOrderById(id);
+  if (!order) {
+    throw new ApiError("Pesanan tidak ditemukan", 404);
+  }
+
+  if (order.status === "COMPLETED") {
+    throw new ApiError("Pesanan sudah selesai", 400);
+  }
+
+  if (order.status === "CANCELLED") {
+    throw new ApiError("Pesanan sudah dibatalkan", 400);
+  }
+
+  const updatedOrder = await repository.updateOrderTable(id, tableId);
+  const notification = await notificationRepository.createNotification(
+    updatedOrder.table.admin.id,
+    `Pesanan dari meja ${
+      oldTable === "0" ? "Take Away" : oldTable
+    } diubah ke meja ${
+      updatedOrder.table.number === 0 ? "Take Away" : updatedOrder.table.number
+    }`,
+    "OTHER",
+    id
+  );
+  emitChangeTableOrder(notification, oldTable);
 };

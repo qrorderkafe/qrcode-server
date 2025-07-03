@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { validateLocation } from "../middleware/validate-location";
 import {
+  changeTableOrder,
   createOrder,
   getAllOrders,
   getOrderById,
@@ -15,6 +16,7 @@ router.post("/", rateLimiter, validateLocation, createOrder);
 router.get("/", getAllOrders);
 router.get("/:id", getOrderById);
 router.patch("/:id/status", authentication, updateOrderStatus);
+router.patch("/:id/change-table", changeTableOrder);
 
 const orderRouter = router;
 export { orderRouter };

@@ -127,3 +127,27 @@ export const updateOrderStatus = async (
     }
   }
 };
+
+export const changeTableOrder = async (
+  req: AdminRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const id = req.params.id;
+  const { tableId, oldTable } = req.body;
+
+  try {
+    await service.changeTableOrder(id, tableId, oldTable);
+    res.status(200).json({
+      status: "Success",
+      message: "Meja pesanan berhasil diupdate",
+    });
+  } catch (error) {
+    console.log(error);
+    if (error instanceof ApiError) {
+      next(new ApiError(error.message, error.statusCode));
+    } else {
+      next(new ApiError("Internal server error", 500));
+    }
+  }
+};

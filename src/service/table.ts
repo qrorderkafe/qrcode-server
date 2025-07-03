@@ -2,7 +2,7 @@ import { ApiError } from "../lib/utils";
 import * as repository from "../repository/table";
 
 export const createTable = async (tableNumber: number, adminId: string) => {
-  if (!tableNumber) {
+  if (!tableNumber && tableNumber !== 0) {
     throw new ApiError("Nomor meja tidak boleh kosong", 400);
   }
   const tableCount = await repository.tableCount(tableNumber);

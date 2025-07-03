@@ -141,3 +141,21 @@ export const getCompletedOrdersCountByDate = async (start: Date, end: Date) => {
 export const getTotalOrder = async (whereCondition = {}) => {
   return await prisma.order.count();
 };
+
+export const updateOrderTable = async (id: string, tableId: string) => {
+  return await prisma.order.update({
+    where: {
+      id,
+    },
+    data: {
+      table_id: tableId,
+    },
+    include: {
+      table: {
+        include: {
+          admin: true,
+        },
+      },
+    },
+  });
+};

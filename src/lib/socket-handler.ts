@@ -47,3 +47,16 @@ export const emitPaymentReceived = (order: any) => {
       data: order,
     });
 };
+
+export const emitChangeTableOrder = (
+  notification: NotificationWithOrderDetail,
+  oldTable: string
+) => {
+  getIO()
+    .to(ADMIN_ROOM)
+    .emit("change-table-order", {
+      type: "OTHER",
+      message: `Pesanan dari meja ${oldTable} diubah ke meja ${notification.order?.table.number}`,
+      data: notification,
+    });
+};
